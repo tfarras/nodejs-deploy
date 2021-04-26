@@ -6,7 +6,7 @@ const PORT = 8080;
 const HOST = '0.0.0.0';
 
 const app = express();
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.send("It's on Digitalocean!");
 });
 
@@ -17,9 +17,9 @@ console.log(`Running on http://${HOST}:${PORT}`);
 function closeGracefully(signal) {
   console.log(`*^!@4=> Received signal to terminate: ${signal}`);
 
-  // await db.close() if we have a db connection in this app
-  // await other things we should cleanup nicely
   server.close(() => {
+    // await db.close() if we have a db connection in this app
+    // await other things we should cleanup nicely
     console.log('Http server closed.');
     process.exit(0);
   });
