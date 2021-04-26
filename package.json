@@ -1,0 +1,13 @@
+{
+  "name": "nodejs-deploy",
+  "version": "1.0.0",
+  "description": "Node.js on DO using Docker and Github Actions",
+  "author": "First Last <first.last@example.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
