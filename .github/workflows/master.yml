@@ -44,6 +44,7 @@ jobs:
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
 
       - name: Stop and remove deployed container
+        continue-on-error: true
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker stop nodejs-image"
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker rm nodejs-image"
