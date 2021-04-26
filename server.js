@@ -10,5 +10,20 @@ app.get('/', (req, res) => {
   res.send("It's on Digitalocean!");
 });
 
-app.listen(PORT, HOST);
-console.log('\x1b[36m', `Running on http://${HOST}:${PORT}`);
+const server = app.listen(PORT, HOST);
+console.log(`Running on http://${HOST}:${PORT}`);
+
+// Graceful shutdown
+function closeGracefully(signal) {
+  console.log(`*^!@4=> Received signal to terminate: ${signal}`);
+
+  // await db.close() if we have a db connection in this app
+  // await other things we should cleanup nicely
+  server.close(() => {
+    console.log('Http server closed.');
+    process.exit(0);
+  });
+}
+
+process.on('SIGINT', closeGracefully);
+process.on('SIGTERM', closeGracefully);
