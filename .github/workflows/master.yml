@@ -51,7 +51,7 @@ jobs:
 
       - name: Start docker container
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=nodejs-image tfarras/nodejs-deploy/nodejs-image:latest"
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=nodejs-image docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
 
       - name: Login to GitHub Packages Docker Registry
         run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout docker.pkg.github.com"
