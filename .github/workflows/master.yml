@@ -33,6 +33,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST_STAGING }} >> ~/.ssh/known_hosts
+
       - name: Pull latest container
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
