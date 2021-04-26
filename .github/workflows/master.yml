@@ -31,17 +31,17 @@ jobs:
       - name: Setup SSH connection
         uses: webfactory/ssh-agent@v0.5.1
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
+          ssh-private-key: ${{ env.SSH_KEY }}
 
       - name: Pull latest container
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
+          ssh ${{env.SSH_USER}}@${{env.SSH_HOST}} "docker pull docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
 
       - name: Stop and remove deployed container
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker stop nodejs-image"
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker rm nodejs-image"
+          ssh ${{env.SSH_USER}}@${{env.SSH_HOST}} "docker stop nodejs-image"
+          ssh ${{env.SSH_USER}}@${{env.SSH_HOST}} "docker rm nodejs-image"
 
       - name: Start docker container
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=nodejs-image tfarras/nodejs-deploy/nodejs-image:latest"
+          ssh ${{env.SSH_USER}}@${{env.SSH_HOST}} "docker run -p 8080:8080 -d --name=nodejs-image tfarras/nodejs-deploy/nodejs-image:latest"
