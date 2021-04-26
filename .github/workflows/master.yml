@@ -36,6 +36,9 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Login to GitHub Packages Docker Registry
+        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker login docker.pkg.github.com -u ${{github.actor}} -p ${{secrets.GITHUB_TOKEN}}"
+
       - name: Pull latest container
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
@@ -48,3 +51,6 @@ jobs:
       - name: Start docker container
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=nodejs-image tfarras/nodejs-deploy/nodejs-image:latest"
+
+      - name: Login to GitHub Packages Docker Registry
+        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout docker.pkg.github.com"
