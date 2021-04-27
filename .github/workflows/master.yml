@@ -10,6 +10,11 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  
+env:
+  REGISTRY: docker.pkg.github.com
+  REPO: tfarras/nodejs-deploy/nodejs-image
+  CONTAINER: nodejs-image
 
 jobs:
   push_to_registry:
@@ -24,10 +29,15 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: tfarras/nodejs-deploy/nodejs-image
+          registry: ${{ env.REGISTRY }}
+          repository: ${{ env.REPO }}
           tag_with_ref: true
-
+  
+  deploy_to_do:
+    needs: [push_to_registry]
+    name: Deploy to Digitalocean
+    runs-on: ubuntu-latest
+    steps:
       - name: Setup SSH connection
         uses: webfactory/ssh-agent@v0.5.1
         with:
@@ -37,21 +47,21 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
       - name: Login to GitHub Packages Docker Registry
-        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker login docker.pkg.github.com -u ${{github.actor}} -p ${{secrets.GITHUB_TOKEN}}"
+        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker login ${{env.REGISTRY}} -u ${{github.actor}} -p ${{secrets.GITHUB_TOKEN}}"
 
       - name: Pull latest container
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull ${{env.REGISTRY}}/${{env.REPO}}:latest"
 
       - name: Stop and remove deployed container
         continue-on-error: true
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker stop nodejs-image"
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker rm nodejs-image"
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker stop ${{env.CONTAINER}}"
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker rm ${{env.CONTAINER}}"
 
       - name: Start docker container
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=nodejs-image docker.pkg.github.com/tfarras/nodejs-deploy/nodejs-image:latest"
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=${{env.CONTAINER}} ${{env.REGISTRY}}/${{env.REPO}}:latest"
 
       - name: Login to GitHub Packages Docker Registry
-        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout docker.pkg.github.com"
+        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout ${{env.REGISTRY}}"
