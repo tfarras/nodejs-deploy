@@ -8,7 +8,7 @@ const HOST = '0.0.0.0';
 const app = express();
 app.get('/', (_, res) => {
   res.send({
-    message: "It's on Digitalocean!",
+    message: "It's on DigitalOcean!",
   });
 });
 

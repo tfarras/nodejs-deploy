@@ -109,7 +109,7 @@ const HOST = '0.0.0.0';
 const app = express();
 app.get('/', (_, res) => {
   res.send({
-    message: "It's on Digitalocean!",
+    message: "It's on DigitalOcean!",
   });
 });
 
@@ -228,7 +228,7 @@ $ docker build . -t nodejs-deploy
 $ docker run -d -p 8080:8080 --name=nodejs-deploy nodejs-deploy:latest
 ```
 
-You can check if it's running by typyng the command:
+You can check if it's running by typing the command:
 
 ```sh
 $ docker ps
@@ -308,9 +308,9 @@ The solution is not to run application using npm and instead use `node` directly
 CMD ["node", "server.js"]
 ```
 
-But there still is a problem. Docker is running our process as `PID 1`. According to [Node.js Docker Workgroup Recomendations](https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md#handling-kernel-signals):
+But there still is a problem. Docker is running our process as `PID 1`. According to [Node.js Docker Workgroup Recommendations](https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md#handling-kernel-signals):
 
-> Node.js was not designed to run as PID 1 which leads to unexpected behaviour when running inside of Docker. For example, a Node.js process running as PID 1 will not respond to `SIGINT` (`CTRL-C`) and similar signals.
+> Node.js was not designed to run as PID 1 which leads to unexpected behavior when running inside of Docker. For example, a Node.js process running as PID 1 will not respond to `SIGINT` (`CTRL-C`) and similar signals.
 
 We can use a tool called `dumb-init` to fix it. It'll be invoked as `PID 1` and then will spawn our node.js process as another process. Let's add to our `Dockerfile`:
 
@@ -359,7 +359,7 @@ Go to your repository, select the `Actions` tab. You will see that GitHub is pro
 
 ![Set up workflow](./assets/setup-workflow.png 'Set up workflow')
 
-We'll be redirected to the page with inital config, it'll be commited to the `main` (`master`) when we'll finish our configuration.
+We'll be redirected to the page with initial config, it'll be committed to the `main` (`master`) when we'll finish our configuration.
 
 Let's talk a little about initial config, it should look like this:
 
@@ -403,8 +403,8 @@ jobs:
 ```
 
 - `name` - is the name of our workflow
-- `on` - is the block where we describe what will trigger our workflow. By default it's trigerred when a `push` is performed to the `master` branch (in this case `master` branch is accessed) or when a `Pull Request` is performed into `master` branch (in this case will be accessed source branch, ex. `feature/TASK-1`). And we can trigger it mannually, it's allowed by `workflow_dispatch` property.
-- `jobs` - is the block in which our jobs are configured. They can run one by one, or simultaneosly (ex. deploying backend and frontend at once in monorepos).
+- `on` - is the block where we describe what will trigger our workflow. By default it's triggered when a `push` is performed to the `master` branch (in this case `master` branch is accessed) or when a `Pull Request` is performed into `master` branch (in this case will be accessed source branch, ex. `feature/TASK-1`). And we can trigger it manually, it's allowed by `workflow_dispatch` property.
+- `jobs` - is the block in which our jobs are configured. They can run one by one, or simultaneously (ex. deploying backend and frontend at once in monorepos).
   - `build` - is the name of our job. It contains it's own configuration.
     - `runs-on` - The type of machine to run the job on. The machine can be either a GitHub-hosted runner or a self-hosted runner.
     - `steps` - place where our logic lives. Each step runs in its own process in the runner environment and has access to the workspace and filesystem.
@@ -416,7 +416,7 @@ More detailed documentation you can find by accessing [Workflow Syntax Documenta
 
 ## Build and push
 
-Now we have enought knowledge to start working on our configuration. Let's define the name of our workflow and when it'll be triggered. In our case workflow should be executed only on changes in the `master` branch or manually, so our declarations will look like this:
+Now we have enough knowledge to start working on our configuration. Let's define the name of our workflow and when it'll be triggered. In our case workflow should be executed only on changes in the `master` branch or manually, so our declarations will look like this:
 
 ```yaml
 name: Build, Push and Deploy Node.js app
@@ -448,7 +448,7 @@ To build and push container to the registry we'll use `docker/build-push-action@
 jobs:
   push_to_registry: # name of our first job
     name: Push Docker image to GitHub Packages # User-friendly name which is displayed in the process of execution
-    runs-on: ubuntu-latest # this job should be runned on the ubuntu-latest runner
+    runs-on: ubuntu-latest # this job should be run on the ubuntu-latest runner
     steps:
       - name: Check out the repo # name of the first step, it'll checkout latest commit in the master branch
         uses: actions/checkout@v2
@@ -513,12 +513,12 @@ But in our case we need also to deploy it, so let's configure our second job.
 
 ## Deploy: Pull and run
 
-Our second job has responsability to connect to our droplet via ssh, pull the container and run the docker container. It'll also run on `ubuntu-latest` runner and it should start only after our previous job called `push_to_registry`. So, our job declaration will look like this:
+Our second job has responsibility to connect to our droplet via ssh, pull the container and run the docker container. It'll also run on `ubuntu-latest` runner and it should start only after our previous job called `push_to_registry`. So, our job declaration will look like this:
 
 ```yaml
 deploy: # name of the second job
   needs: [push_to_registry] # specify that it's dependent on the push_to_registry job
-  name: Deploy to Digitalocean # user-friendly name of the job
+  name: Deploy to DigitalOcean # user-friendly name of the job
   runs-on: ubuntu-latest # specify runner
 ```
 
@@ -537,7 +537,7 @@ Once there're set, you'll see the following result. These secrets cannot be seen
 
 ![Secrets](./assets/secrets.png 'Secrets')
 
-Now we can continue with our `steps` configuration. To perform `SSH` connection we'll use `webfactory/ssh-agent` action. More detailes and description you can find [here](https://github.com/marketplace/actions/webfactory-ssh-agent).
+Now we can continue with our `steps` configuration. To perform `SSH` connection we'll use `webfactory/ssh-agent` action. More details and description you can find [here](https://github.com/marketplace/actions/webfactory-ssh-agent).
 
 Let's configure `SSH` connection:
 
@@ -578,8 +578,8 @@ In this step we also connect via `ssh` but let's take a closer look to the docke
 
 - `docker run` - runs the container itself
 - `-p 8080:8080` - specifies that we need to bind exposed from the container port (`8080`) with the local port of the machine(droplet).
-- `-d` - flag is used to run container in dettached mode
-- `--restart unless-stopped` - specifies that cotnainer should be restarted unless it's stopped manually. It also will start on the machine startup.
+- `-d` - flag is used to run container in detached mode
+- `--restart unless-stopped` - specifies that container should be restarted unless it's stopped manually. It also will start on the machine startup.
 - `--name=${{env.CONTAINER}}` - specifies the name under which container will be started
 - `${{env.REGISTRY}}/${{env.REPO}}:latest` - specifies which image we need to run as a container
 
@@ -620,7 +620,7 @@ jobs:
           tag_with_ref: true
   deploy:
     needs: [push_to_registry]
-    name: Deploy to Digitalocean
+    name: Deploy to DigitalOcean
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH connection
@@ -649,14 +649,14 @@ To pull containers from the github container registry we need to authenticate to
   run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker login ${{env.REGISTRY}} -u ${{github.actor}} -p ${{secrets.GITHUB_TOKEN}}"
 ```
 
-But for security reasons it's not a good idea to leave docker authenthicated to a registry on the remote machine, so we need to add at the end of our workflow to logout from the registry:
+But for security reasons it's not a good idea to leave docker authenticated to a registry on the remote machine, so we need to add at the end of our workflow to logout from the registry:
 
 ```yaml
 - name: Logout from the GitHub Packages Docker Registry
   run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout ${{env.REGISTRY}}"
 ```
 
-With these steps we solved the authenthication issue, but there is one more. On the second run our workflow will fail.
+With these steps we solved the authentication issue, but there is one more. On the second run our workflow will fail.
 
 **Why?** The reason is simple, because port and name of our container are already used from the previous run.
 
@@ -713,7 +713,7 @@ jobs:
           tag_with_ref: true
   deploy:
     needs: [push_to_registry]
-    name: Deploy to Digitalocean
+    name: Deploy to DigitalOcean
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH connection
@@ -751,7 +751,7 @@ jobs:
 
 Now we can commit and push your workflow run into `master` branch!
 
-Workflow should be trigerred automatically, since we performed a `push` action to the `master` branch.
+Workflow should be triggered automatically, since we performed a `push` action to the `master` branch.
 
 If you did everything right, you will not get any error in the execution:
 
