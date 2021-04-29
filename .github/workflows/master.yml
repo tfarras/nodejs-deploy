@@ -1,10 +1,8 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Publish Docker image
+name: Build, Push and Deploy Node.js app
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push events but only for the master branch
   push:
     branches: [master]
 
@@ -32,8 +30,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           repository: ${{ env.REPO }}
           tag_with_ref: true
-  
-  deploy_to_do:
+  deploy:
     needs: [push_to_registry]
     name: Deploy to Digitalocean
     runs-on: ubuntu-latest
@@ -46,22 +43,26 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Login to GitHub Packages Docker Registry
+      - name: Login to the GitHub Packages Docker Registry
         run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker login ${{env.REGISTRY}} -u ${{github.actor}} -p ${{secrets.GITHUB_TOKEN}}"
 
       - name: Pull latest container
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull ${{env.REGISTRY}}/${{env.REPO}}:latest"
 
-      - name: Stop and remove deployed container
+      - name: Stop deployed container
         continue-on-error: true
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker stop ${{env.CONTAINER}}"
+
+      - name: Remove deployed container
+        continue-on-error: true
+        run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker rm ${{env.CONTAINER}}"
 
       - name: Start docker container
         run: |
           ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --name=${{env.CONTAINER}} ${{env.REGISTRY}}/${{env.REPO}}:latest"
 
-      - name: Login to GitHub Packages Docker Registry
+      - name: Logout from the GitHub Packages Docker Registry
         run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout ${{env.REGISTRY}}"
