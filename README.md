@@ -774,8 +774,3 @@ In this tutorial, we created a Node.js and dockerized it according to best pract
 Find boilerplate on [GitHub](https://github.com/tfarras/nodejs-deploy)
 
 Find me on [GitHub](https://github.com/tfarras) and [LinkedIn](https://www.linkedin.com/in/taimoor-farras/)
-<<<<<<< HEAD
-
-> > > > > > > # Stashed changes
-> > > > > > >
-> > > > > > > e4cea94ddf63c3ca85dfb4d68131d6aca698b07f
