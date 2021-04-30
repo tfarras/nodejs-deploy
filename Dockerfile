@@ -9,7 +9,7 @@ ENV NODE_ENV production
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Copy app files
 COPY --chown=node:node . /usr/src/app
 
 # Install only production dependencies
