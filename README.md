@@ -9,7 +9,7 @@
 
 ## What are Github Actions?
 
-GitHub Actions is an API for cause and effect on GitHub: orchestrate any workflow, based on any event, while GitHub manages the execution, provides rich feedback and secures every step along the way.
+GitHub Actions is an API for cause and effect on GitHub: orchestrate any workflow, based on any event, while GitHub manages the execution, provides rich feedback, and secures every step along the way.
 
 ## What is Docker?
 
@@ -19,7 +19,7 @@ Docker is an open platform for developing, shipping, and running applications. D
 
 DigitalOcean Droplets are Linux-based virtual machines (VMs) that run on top of virtualized hardware. Each Droplet you create is a new server you can use, either standalone or as part of a larger, cloud-based infrastructure.
 
-In this tutorial we'll use Github Packages as container registry for our docker image.
+In this tutorial, we'll use Github Packages as a container registry for our docker image.
 
 > Note: GitHub Container Registry is currently in public beta and subject to change. During the beta, storage and bandwidth are free. To use GitHub Container Registry, you must enable the feature preview. For more information, see "About GitHub Container Registry" and "Enabling improved container support."
 
@@ -138,7 +138,7 @@ Now we can proceed to dockerizing our application.
 
 # Dockerize Node.js app
 
-To achieve our goal, first of all we need to create the `Dockerfile`. According to the documentation a Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.
+To achieve our goal, first of all, we need to create the `Dockerfile`. According to the documentation, a Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.
 
 ## Simple Dockerfile
 
@@ -154,13 +154,13 @@ CMD "npm" "start"
 
 You can already build and run your container and it will work, but maybe we can do it better? Of course!
 
-Let's specify version of base image:
+Let's specify the version of the base image:
 
 ```Dockerfile
 FROM node:14-alpine
 ```
 
-Then let's take a look to the dependency installation. We're preparing production build of application, so we don't need dev dependencies to be installed. We can fix it by changing `RUN npm install` to:
+Then let's take a look at the dependency installation. We're preparing a production build of the application, so we don't need dev dependencies to be installed. We can fix it by changing `RUN npm install` to:
 
 ```Dockerfile
 # Install only production dependencies from lock file
@@ -216,7 +216,7 @@ RUN npm ci --only=production
 # friends don’t let friends run containers as root!
 USER node
 
-# Make port 8080 accessible outside of container
+# Make port 8080 accessible outside of the container
 EXPOSE 8080
 CMD "npm" "start"
 ```
@@ -234,7 +234,7 @@ You can check if it's running by typing the command:
 $ docker ps
 ```
 
-And you can see container's logs with the following command:
+And you can see the container's logs with the following command:
 
 ```sh
 $ docker logs nodejs-deploy
@@ -287,7 +287,7 @@ process.on('SIGINT', closeGracefully);
 process.on('SIGTERM', closeGracefully);
 ```
 
-This basically calls `server.close()`, which will instruct the Node.js HTTP server to:
+This calls `server.close()`, which will instruct the Node.js HTTP server to:
 
 - Not accept any more requests.
 - Finish all running requests.
@@ -298,11 +298,11 @@ You may have a question "What if a request is taking too much time?". So if the 
 
 ### Part 2
 
-Now in our `Dockerfile` we're starting our application with the command `npm start`. Unfortunately there is a big problem with this:
+Now in our `Dockerfile`, we're starting our application with the command `npm start`. Unfortunately, there is a big problem with this:
 
-If `yarn` or `npm` get a `SIGINT` or `SIGTERM` signal, they correctly forward the signal to spawned child process (in this case `node server.js`). However, it does not wait for the child processes to stop. Instead, `yarn`/`npm` immediately stop themselves.
+If `yarn` or `npm` get a `SIGINT` or `SIGTERM` signal, they correctly forward the signal to spawned child process (in this case `node server.js`). However, it does not wait for the child's processes to stop. Instead, `yarn`/`npm` immediately stop themselves.
 
-The solution is not to run application using npm and instead use `node` directly:
+The solution is not to run the application using npm and instead use `node` directly:
 
 ```Dockerfile
 CMD ["node", "server.js"]
@@ -359,11 +359,11 @@ Go to your repository, select the `Actions` tab. You will see that GitHub is pro
 
 ![Set up workflow](./assets/setup-workflow.png 'Set up workflow')
 
-We'll be redirected to the page with initial config, it'll be committed to the `main` (`master`) when we'll finish our configuration.
+We'll be redirected to the page with the initial config, it'll be committed to the `main` (`master`) when we'll finish our configuration.
 
-Let's talk a little about initial config, it should look like this:
+Let's talk a little about the initial config, it should look like this:
 
-```yaml
+```YAML
 # This is a basic workflow to help you get started with Actions
 
 name: CI
@@ -391,11 +391,11 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
+      # Runs a single command using the runner's shell
       - name: Run a one-line script
         run: echo Hello, world!
 
-      # Runs a set of commands using the runners shell
+      # Runs a set of commands using the runner's shell
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
@@ -403,14 +403,14 @@ jobs:
 ```
 
 - `name` - is the name of our workflow
-- `on` - is the block where we describe what will trigger our workflow. By default it's triggered when a `push` is performed to the `master` branch (in this case `master` branch is accessed) or when a `Pull Request` is performed into `master` branch (in this case will be accessed source branch, ex. `feature/TASK-1`). And we can trigger it manually, it's allowed by `workflow_dispatch` property.
-- `jobs` - is the block in which our jobs are configured. They can run one by one, or simultaneously (ex. deploying backend and frontend at once in monorepos).
-  - `build` - is the name of our job. It contains it's own configuration.
+- `on` - is the block where we describe what will trigger our workflow. By default, it's triggered when a `push` is performed to the `master` branch (in this case `master` branch is accessed) or when a `Pull Request` is performed into the `master` branch (in this case will be accessed source branch, ex. `feature/TASK-1`). And we can trigger it manually, it's allowed by the `workflow_dispatch` property.
+- `jobs` - is the block in which our jobs are configured. They can run one by one, or simultaneously (ex. deploying backend and frontend at once in mono repo).
+  - `build` - is the name of our job. It contains its configuration.
     - `runs-on` - The type of machine to run the job on. The machine can be either a GitHub-hosted runner or a self-hosted runner.
-    - `steps` - place where our logic lives. Each step runs in its own process in the runner environment and has access to the workspace and filesystem.
-      - `uses` - selects an action to run as part of a step in your job. An action is a reusable unit of code. In this case is called predefined by GitHub action `actions/checkout@v2` which allow us to checkout the source branch (`master` or other one which triggered the workflow)
+    - `steps` - the place where our logic lives. Each step runs in its process in the runner environment and has access to the workspace and filesystem.
+      - `uses` - selects an action to run as part of a step in your job. An action is a reusable unit of code. In this case, is called predefined by GitHub action `actions/checkout@v2` which allow us to `checkout` the source branch (`master` or another one that triggered the workflow)
       - `name` - is the name of the step. It'll be shown in the progress of workflow execution.
-      - `run` - runs command-line programs using the operating system's shell. If you do not provide a `name`, the step name will default to the text specified in the `run` command. It can execute one line command or multiline commands as well.
+      - `run` - runs command-line programs using the operating system's shell. If you do not provide a `name`, the step name will default to the text specified in the `run` command. It can execute a one-line command or multiline commands as well.
 
 More detailed documentation you can find by accessing [Workflow Syntax Documentation](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions)
 
@@ -418,7 +418,7 @@ More detailed documentation you can find by accessing [Workflow Syntax Documenta
 
 Now we have enough knowledge to start working on our configuration. Let's define the name of our workflow and when it'll be triggered. In our case workflow should be executed only on changes in the `master` branch or manually, so our declarations will look like this:
 
-```yaml
+```YAML
 name: Build, Push and Deploy Node.js app
 
 # Controls when the action will run.
@@ -431,26 +431,26 @@ on:
   workflow_dispatch:
 ```
 
-Now we need to declare some `env` variables to be able reuse them in our configuration to avoid repeating the same things:
+Now we need to declare some `env` variables to be able to reuse them in our configuration to avoid repeating the same things:
 
-```yaml
+```YAML
 env:
-  REGISTRY: docker.pkg.github.com # we will push our docker-image to the github packages
+  REGISTRY: docker.pkg.github.com # we will push our docker-image to the GitHub packages
   REPO: tfarras/nodejs-deploy/nodejs-image # is the name of our image which will be used to push or pull it
-  CONTAINER: nodejs-image # name of the container which will be used to stop or start container
+  CONTAINER: nodejs-image # name of the container which will be used to stop or start the container
 ```
 
-It's time to define our jobs. In our case here will be two jobs, one will build and push the image to the registry and another to pull and run the container on our droplet.
+It's time to define our jobs. In our case there will be two jobs, one will build and push the image to the registry and another to pull and run the container on our droplet.
 
-To build and push container to the registry we'll use `docker/build-push-action@v1` action, you can find detailed documentation [here](https://github.com/docker/build-push-action).
+To build and push the container to the registry we'll use the `docker/build-push-action@v1` action, you can find detailed documentation [here](https://github.com/docker/build-push-action).
 
-```yaml
+```YAML
 jobs:
   push_to_registry: # name of our first job
     name: Push Docker image to GitHub Packages # User-friendly name which is displayed in the process of execution
     runs-on: ubuntu-latest # this job should be run on the ubuntu-latest runner
     steps:
-      - name: Check out the repo # name of the first step, it'll checkout latest commit in the master branch
+      - name: Check out the repo # name of the first step, it'll `checkout` the latest commit in the master branch
         uses: actions/checkout@v2
 
       - name: Push to GitHub Packages # name of the second step
@@ -465,7 +465,7 @@ jobs:
 
 At this point our workflow config should look like this:
 
-```yaml
+```YAML
 name: Build, Push and Deploy Node.js app
 
 # Controls when the action will run.
@@ -504,28 +504,28 @@ As you can see we're using `github.actor` and `secrets.GITHUB_TOKEN`, and you mo
 
 These variables are predefined by GitHub.
 
-- `github.actor` - is the login of the user that initiated the workflow run and takes part of `github` context. You can read more about it [here](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions)
+- `github.actor` - is the login of the user that initiated the workflow run and takes part in the `github` context. You can read more about it [here](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions)
 - `secrets.GITHUB_TOKEN` - is a token provided by GitHub. It's created on each workflow run. You can use the GITHUB_TOKEN to authenticate in a workflow run. Learn more [here](https://docs.github.com/en/actions/reference/authentication-in-a-workflow).
 
-This action can already be used if you want just to build and push your container. It's suitable if you just working on an docker-image and it should be only stored in the registry, to have ability to pull it when you need.
+This action can already be used if you want just to build and push your container. It's suitable if you just working on a docker-image and it should be only stored in the registry, and you need to be able to pull it when you need it.
 
 But in our case we need also to deploy it, so let's configure our second job.
 
 ## Deploy: Pull and run
 
-Our second job has responsibility to connect to our droplet via ssh, pull the container and run the docker container. It'll also run on `ubuntu-latest` runner and it should start only after our previous job called `push_to_registry`. So, our job declaration will look like this:
+Our second job has the responsibility to connect to our droplet via ssh, pull the container and run the docker container. It'll also run on `ubuntu-latest` runner and it should start only after our previous job called `push_to_registry`. So, our job declaration will look like this:
 
-```yaml
+```YAML
 deploy: # name of the second job
   needs: [push_to_registry] # specify that it's dependent on the push_to_registry job
   name: Deploy to DigitalOcean # user-friendly name of the job
   runs-on: ubuntu-latest # specify runner
 ```
 
-Before steps configuration we need to add some more variables, namely `SSH_KEY`, `SSH_USER` and `SSH_HOST`. These variables will be used to authenticate our ssh connection to the droplet. But like other secrets of our application it's very bad idea to store them in the repository files, so we need another, more secure, way to declare them. And GitHub provides one - it's called `Secrets` and you can find them in the `Settings` tab of your repository in GitHub.
+Before steps configuration, we need to add some more variables, namely `SSH_KEY`, `SSH_USER`, and `SSH_HOST`. These variables will be used to authenticate our ssh connection to the droplet. But like other secrets of our application, it's a very bad idea to store them in the repository files, so we need another, more secure, way to declare them. And GitHub provides one - it's called `Secrets` and you can find them in the `Settings` tab of your repository in GitHub.
 
 Secrets can be of two types: Repository and Environment secrets. You can learn more about them in the [documentation](https://docs.github.com/en/actions/reference/encrypted-secrets).
-In our case we'll use Repository secrets, so go to the configuration page and click on the `New repository secret`.
+In our case, we'll use Repository secrets, so go to the configuration page and click on the `New repository secret`.
 
 As specified before, we need three variables:
 
@@ -533,7 +533,7 @@ As specified before, we need three variables:
 - `SSH_USER` - username used to access the droplet via `ssh`
 - `SSH_HOST` - host of your droplet
 
-Once there're set, you'll see the following result. These secrets cannot be seen again even by repository owner, they can be only **updated** or **removed**.
+Once they're set, you'll see the following result. These secrets cannot be seen again even by the repository owner, they can be only **updated** or **removed**.
 
 ![Secrets](./assets/secrets.png 'Secrets')
 
@@ -549,7 +549,7 @@ steps:
       ssh-private-key: ${{ secrets.SSH_KEY }} # provide private key which we added before
 ```
 
-According to documentation, this actions will not update the `.known-hosts` file for us, so let's declare another step which will update this file using `ssh-keyscan`.
+According to documentation, these actions will not update the `.known-hosts` file for us, so let's declare another step which will update this file using `ssh-keyscan`.
 
 ```yaml
 - name: Adding Known Hosts
@@ -564,7 +564,7 @@ Now it's time to add command which will pull our image to the droplet:
     ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker pull ${{env.REGISTRY}}/${{env.REPO}}:latest"
 ```
 
-In this command we specified that we need to connect via `ssh` using our `user` and `host` and run the command to pull latest version of our docker image.
+In this command, we specified that we need to connect via `ssh` using our `user` and `host` and run the command to pull the latest version of our docker image.
 
 Now we need to run our container:
 
@@ -574,18 +574,18 @@ Now we need to run our container:
     ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker run -p 8080:8080 -d --restart unless-stopped --name=${{env.CONTAINER}} ${{env.REGISTRY}}/${{env.REPO}}:latest"
 ```
 
-In this step we also connect via `ssh` but let's take a closer look to the docker command
+In this step, we also connect via `ssh` but let's take a closer look at the docker command
 
 - `docker run` - runs the container itself
 - `-p 8080:8080` - specifies that we need to bind exposed from the container port (`8080`) with the local port of the machine(droplet).
-- `-d` - flag is used to run container in detached mode
-- `--restart unless-stopped` - specifies that container should be restarted unless it's stopped manually. It also will start on the machine startup.
+- `-d` - flag is used to run the container in detached mode
+- `--restart unless-stopped` - specifies that the container should be restarted unless it's stopped manually. It also will start on the machine startup.
 - `--name=${{env.CONTAINER}}` - specifies the name under which container will be started
 - `${{env.REGISTRY}}/${{env.REPO}}:latest` - specifies which image we need to run as a container
 
 At this point our configuration will look like this:
 
-```yaml
+```YAML
 name: Build, Push and Deploy Node.js app
 
 # Controls when the action will run.
@@ -649,20 +649,20 @@ To pull containers from the github container registry we need to authenticate to
   run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker login ${{env.REGISTRY}} -u ${{github.actor}} -p ${{secrets.GITHUB_TOKEN}}"
 ```
 
-But for security reasons it's not a good idea to leave docker authenticated to a registry on the remote machine, so we need to add at the end of our workflow to logout from the registry:
+But for security reasons, it's not a good idea to leave docker authenticated to a registry on the remote machine, so we need to add at the end of our workflow to logout from the registry:
 
-```yaml
+```YAML
 - name: Logout from the GitHub Packages Docker Registry
   run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout ${{env.REGISTRY}}"
 ```
 
-With these steps we solved the authentication issue, but there is one more. On the second run our workflow will fail.
+With these steps, we solved the authentication issue, but there is one more. On the second run, our workflow will fail.
 
-**Why?** The reason is simple, because port and name of our container are already used from the previous run.
+**Why?** The reason is simple because the port and name of our container are already used from the previous run.
 
-**How to fix?** The fix is pretty simple, we just need to stop and remove the previous container. Let's add two more steps just before starting our container:
+**How to fix it?** The fix is pretty simple, we just need to stop and remove the previous container. Let's add two more steps just before starting our container:
 
-```yaml
+```YAML
 - name: Stop deployed container
   continue-on-error: true
   run: |
@@ -674,11 +674,11 @@ With these steps we solved the authentication issue, but there is one more. On t
     ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker rm ${{env.CONTAINER}}"
 ```
 
-You probably have a question:"_Why do we need `continue-on-error` property here?_". The reason is that these command will throw an error if there isn't any running or existing container with the name of our container. It's not a problem for our workflow, so we'll just skip these errors.
+You probably have a question:"_Why do we need `continue-on-error` property here?_". The reason is that these commands will throw an error if there isn't any running or existing container with the name of our container. It's not a problem for our workflow, so we'll just skip these errors.
 
 The final version of our workflow configuration will look like this:
 
-```yaml
+```YAML
 name: Build, Push and Deploy Node.js app
 
 # Controls when the action will run.
@@ -749,15 +749,15 @@ jobs:
         run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "docker logout ${{env.REGISTRY}}"
 ```
 
-Now we can commit and push your workflow run into `master` branch!
+Now we can commit and push your workflow to run into the `master` branch!
 
-Workflow should be triggered automatically, since we performed a `push` action to the `master` branch.
+Workflow should be triggered automatically since we performed a `push` action to the `master` branch.
 
 If you did everything right, you will not get any error in the execution:
 
 ![Result](./assets/result.png 'Result')
 
-And now it's time to check our deployed application works on the remote server. Let's run a query to your `host:8080` or to a domain if it's configured on your machine:
+And now it's time to check our deployed application works on the remote server. Let's run a query to your `host:8080` or a domain if it's configured on your machine:
 
 ![Postman Result](./assets/postman-result.png 'Postman Result')
 
@@ -765,9 +765,9 @@ As you can see everything works great!
 
 # Conclusion
 
-In this tutorial we created a Node.js and dockerized it according to best practices and then deployed it using GitHub Actions, GitHub Packages and DigitalOcean droplet.
+In this tutorial, we created a Node.js and dockerized it according to best practices and then deployed it using GitHub Actions, GitHub Packages, and DigitalOcean droplet.
 
-> Note: `GitHub Packages` can be substituted by another container registry according to the action documentation, and instead of `DigitalOcean` can be used another `VPS`. You're free to customize this configuration according your needs.
+> Note: `GitHub Packages` can be substituted by another container registry according to the action documentation, and instead of `DigitalOcean` can be used another `VPS`. You're free to customize this configuration according to your needs.
 
 Find boilerplate on [GitHub](https://github.com/tfarras/nodejs-deploy)
 
